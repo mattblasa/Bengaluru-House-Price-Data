@@ -228,19 +228,19 @@ df5.head()
 df5.info()
 
 
-# In[61]:
+# In[35]:
 
 
 df5['size'].unique()
 
 
-# In[35]:
+# In[36]:
 
 
 df5.location.unique()
 
 
-# In[36]:
+# In[37]:
 
 
 len(df5.location.unique())
@@ -248,71 +248,71 @@ len(df5.location.unique())
 
 # Dimentionality curse - when you have too many dimensions for feature engineering. 
 
-# In[37]:
+# In[38]:
 
 
 df5.location = df5.location.apply(lambda x: x.strip())
 location_stats = df5.groupby('location')['location'].agg('count').sort_values(ascending = False)
 
 
-# In[38]:
+# In[39]:
 
 
 location_stats
 
 
-# In[39]:
+# In[40]:
 
 
 #how many locations have l
 len(location_stats[location_stats<=10])
 
 
-# In[40]:
+# In[41]:
 
 
 #filter a column if the count of the groupby aggregation is less than a number
 location_stats_less_than_10 = location_stats[location_stats<=10]
 
 
-# In[41]:
+# In[42]:
 
 
 location_stats_less_than_10
 
 
-# In[42]:
+# In[43]:
 
 
 #reclassifies features as 'other', if name in df5['location'] is in location_stats_less_than_10
 df5['location'] = df5['location'].apply(lambda x: 'other' if x in location_stats_less_than_10 else x)
 
 
-# In[43]:
+# In[44]:
 
 
 df5['location']
 
 
-# In[44]:
+# In[45]:
 
 
 len(df5.location.unique())
 
 
-# In[45]:
+# In[46]:
 
 
 df5.head(20)
 
 
-# In[46]:
+# In[47]:
 
 
 df5[df5['location'] == 'other']
 
 
-# In[47]:
+# In[48]:
 
 
 # total_sqr_ft / bedrooms 
@@ -322,26 +322,26 @@ df5[df5['total_sqft']/df5['bhk']<300].head()
 
 # The code above checks for errors. There is no such thing as a 8 bedroom house with 9 baths that is 600 sqft
 
-# In[48]:
+# In[49]:
 
 
 df5.shape
 
 
-# In[55]:
+# In[50]:
 
 
 #find a something where the total square ft per bedroom is not less that 300 sqft
 df6 = df5[~(df5['total_sqft']/df5['bhk']<300)]
 
 
-# In[50]:
+# In[51]:
 
 
 df6.shape
 
 
-# In[54]:
+# In[52]:
 
 
 df6.head()
@@ -349,7 +349,7 @@ df6.head()
 
 # Price per Square Feet: High and Low
 
-# In[51]:
+# In[53]:
 
 
 df6.price_per_sqft.describe()
@@ -359,7 +359,7 @@ df6.price_per_sqft.describe()
 
 # Filter out everything beyond 1 std deviation 
 
-# In[1]:
+# In[54]:
 
 
 def remove_pps_outliers(df):
@@ -375,25 +375,25 @@ def remove_pps_outliers(df):
     return df_out
 
 
-# In[52]:
+# In[55]:
 
 
 df7 = remove_pps_outliers(df6)
 
 
-# In[53]:
+# In[56]:
 
 
 df7.shape
 
 
-# In[64]:
+# In[57]:
 
 
 import matplotlib.pyplot as plt
 
 
-# In[65]:
+# In[58]:
 
 
 def plot_scatter_chart(df,location):
@@ -411,25 +411,25 @@ def plot_scatter_chart(df,location):
     plt.legend()
 
 
-# In[66]:
+# In[59]:
 
 
 plot_scatter_chart(df7, 'Rajaji Nagar')
 
 
-# In[67]:
+# In[60]:
 
 
 plot_scatter_chart(df7, 'Hebbal')
 
 
-# In[75]:
+# In[61]:
 
 
 df7
 
 
-# In[76]:
+# In[62]:
 
 
 #13:03
@@ -450,26 +450,161 @@ def remove_bhk_outliers(df):
     return df.drop(exclude_indices, axis = 'index')
 
 
-# In[77]:
+# In[63]:
 
 
 df8 = remove_bhk_outliers(df7)
 
 
-# In[78]:
+# In[64]:
 
 
 df8.head(20)
 
 
-# In[79]:
+# In[65]:
 
 
 df8.shape
 
 
+# In[66]:
+
+
+#!jupyter nbconvert --to script India_House_Data.ipynb
+
+
+# In[67]:
+
+
+plot_scatter_chart(df7,"Hebbal")
+
+
+# In[68]:
+
+
+import matplotlib
+matplotlib.rcParams['figure.figsize'] = (20,10)
+plt.hist(df8.price_per_sqft, rwidth = 0.8)
+plt.xlabel('Price Per Square Feet')
+plt.ylabel('Count')
+
+
+# In[69]:
+
+
+df8.bath.unique()
+
+
+# In[70]:
+
+
+df8[df8.bath>10]
+
+
+# In[71]:
+
+
+plt.hist(df8.bath,rwidth = 0.8)
+plt.xlabel("number of bathrooms")
+plt.ylabel('Count')
+
+
+# In[72]:
+
+
+df9 = df8[df8.bath<df8.bhk+2]
+df9.shape
+
+
+# In[73]:
+
+
+df10 = df9.drop(['size', 'price_per_sqft'], axis = 'columns')
+df10.head()
+
+
+# # Machine Learning Model
+
+# In[74]:
+
+
+dummies = pd.get_dummies(df10.location)
+dummies.head(3)
+
+
+# In[75]:
+
+
+df11 = pd.concat([df10, dummies.drop('other', axis='columns')], axis = 'columns')
+
+
+# In[76]:
+
+
+df11.head()
+
+
+# In[77]:
+
+
+df12 = df11.drop('location', axis = 'columns')
+
+
+# In[78]:
+
+
+df12.head()
+
+
+# In[79]:
+
+
+X = df12.drop('price', axis = 'columns')
+X.head()
+
+
+# In[80]:
+
+
+y = df12.price
+
+
+# In[81]:
+
+
+y.head()
+
+
+# In[83]:
+
+
+from sklearn.model_selection import train_test_split
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, random_state = 10)
+
+
+# In[85]:
+
+
+from sklearn.linear_model import LinearRegression
+lr_clf = LinearRegression()
+lr_clf.fit(X_train, y_train)
+lr_clf.score(X_test, y_test)
+
+
+# In[86]:
+
+
+from sklearn.model_selection import ShuffleSplit 
+from sklearn.model_selection import cross_val_score 
+
+cv = ShuffleSplit(n_splits = 5, test_size = 2, random_state = 0)
+
+cross_val_score(LinearRegression(), X, y, cv = cv)
+
+
 # In[ ]:
 
 
-#test
+from sklearn.model_selection import Grid
 
