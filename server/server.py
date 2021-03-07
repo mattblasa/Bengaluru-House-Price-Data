@@ -13,7 +13,9 @@ def get_location_names():
 
     return response
 
-    return "Hi"
+@app.route('/predict_home_price', methods=['GET', 'POST'])
+def predict_home_price():
+    pass
 
 if __name__ == '__main__':
     print("Starting Python Flask Server for Home Price Prediction...")
