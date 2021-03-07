@@ -1,10 +1,15 @@
 #reads the columns.json
 import json 
 import pickle
+import numpy as np
 
 __locations = None
 __data_columns = None
 __model = None 
+
+def get_estimated_price(location, sqft, bhk, bath):
+    x = np.zeros() 
+    return __model.predict([x])
 
 def get_location_names():
     return __locations
