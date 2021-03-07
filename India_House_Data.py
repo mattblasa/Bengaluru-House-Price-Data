@@ -3,7 +3,7 @@
 
 # dependent variable is price in indian rupees 
 
-# In[2]:
+# In[1]:
 
 
 import pandas as pd 
@@ -13,56 +13,56 @@ get_ipython().run_line_magic('matplotlib', 'inline')
 import matplotlib
 
 
-# In[3]:
+# In[2]:
 
 
 matplotlib.rcParams['figure.figsize'] =(20,10)
 
 
-# In[4]:
+# In[3]:
 
 
 df1 = pd.read_csv('Bengaluru_House_Data.csv')
 df1.head()
 
 
-# In[5]:
+# In[4]:
 
 
 df1.shape
 
 
-# In[6]:
+# In[5]:
 
 
 df1.groupby('area_type')['area_type'].agg('count')
 
 
-# In[7]:
+# In[6]:
 
 
 df2 = df1.drop(['area_type', 'society','balcony','availability'], axis = 'columns')
 
 
-# In[8]:
+# In[7]:
 
 
 df2.head()
 
 
-# In[9]:
+# In[8]:
 
 
 df2.describe()
 
 
-# In[10]:
+# In[9]:
 
 
 df2.info()
 
 
-# In[11]:
+# In[10]:
 
 
 import seaborn as sns 
@@ -70,69 +70,69 @@ import seaborn as sns
 
 # # Data Cleaning
 
-# In[12]:
+# In[11]:
 
 
 df2.isnull().sum()
 
 
-# In[13]:
+# In[12]:
 
 
 df3 = df2.dropna()
 df3.isnull().sum()
 
 
-# In[14]:
+# In[13]:
 
 
 df3.shape
 
 
-# In[15]:
+# In[14]:
 
 
 df3['size'].unique()
 
 
-# In[16]:
+# In[15]:
 
 
 #Split on space, the [0] index means that you are taking the first number from the split string
 df3['bhk'] = df3['size'].apply(lambda x: int(x.split(' ')[0]))
 
 
-# In[17]:
+# In[16]:
 
 
 df3.head()
 
 
-# In[18]:
+# In[17]:
 
 
 df3.info()
 
 
-# In[19]:
+# In[18]:
 
 
 df3['bhk'].unique()
 
 
-# In[20]:
+# In[19]:
 
 
 df3[df3['bhk']>20]
 
 
-# In[21]:
+# In[20]:
 
 
 df3.total_sqft.unique()
 
 
-# In[22]:
+# In[21]:
 
 
 def is_float(x):
@@ -143,21 +143,21 @@ def is_float(x):
     return True
 
 
-# In[23]:
+# In[22]:
 
 
 #True for is_float method
 df3[df3['total_sqft'].apply(is_float)]
 
 
-# In[24]:
+# In[23]:
 
 
 #False for is_float method
 df3[~df3['total_sqft'].apply(is_float)].head(20)
 
 
-# In[25]:
+# In[24]:
 
 
 def convert_sqft_to_num(x):
@@ -171,32 +171,32 @@ def convert_sqft_to_num(x):
         
 
 
-# In[26]:
+# In[25]:
 
 
 convert_sqft_to_num('3090 - 5002')
 
 
-# In[27]:
+# In[26]:
 
 
 convert_sqft_to_num('1100Sq. Yards')
 
 
-# In[28]:
+# In[27]:
 
 
 df4 = df3.copy()
 df4['total_sqft'] = df4['total_sqft'].apply(convert_sqft_to_num)
 
 
-# In[29]:
+# In[28]:
 
 
 df4.head()
 
 
-# In[30]:
+# In[29]:
 
 
 df4.loc[30]
@@ -204,43 +204,43 @@ df4.loc[30]
 
 # # Feature Engineering
 
-# In[31]:
+# In[30]:
 
 
 df5 = df4.copy()
 
 
-# In[32]:
+# In[31]:
 
 
 df5['price_per_sqft'] = df5['price']*100000/df5['total_sqft']
 
 
-# In[33]:
+# In[32]:
 
 
 df5.head()
 
 
-# In[34]:
+# In[33]:
 
 
 df5.info()
 
 
-# In[35]:
+# In[34]:
 
 
 df5['size'].unique()
 
 
-# In[36]:
+# In[35]:
 
 
 df5.location.unique()
 
 
-# In[37]:
+# In[36]:
 
 
 len(df5.location.unique())
@@ -248,71 +248,71 @@ len(df5.location.unique())
 
 # Dimentionality curse - when you have too many dimensions for feature engineering. 
 
-# In[38]:
+# In[37]:
 
 
 df5.location = df5.location.apply(lambda x: x.strip())
 location_stats = df5.groupby('location')['location'].agg('count').sort_values(ascending = False)
 
 
-# In[39]:
+# In[38]:
 
 
 location_stats
 
 
-# In[40]:
+# In[39]:
 
 
 #how many locations have l
 len(location_stats[location_stats<=10])
 
 
-# In[41]:
+# In[40]:
 
 
 #filter a column if the count of the groupby aggregation is less than a number
 location_stats_less_than_10 = location_stats[location_stats<=10]
 
 
-# In[42]:
+# In[41]:
 
 
 location_stats_less_than_10
 
 
-# In[43]:
+# In[42]:
 
 
 #reclassifies features as 'other', if name in df5['location'] is in location_stats_less_than_10
 df5['location'] = df5['location'].apply(lambda x: 'other' if x in location_stats_less_than_10 else x)
 
 
-# In[44]:
+# In[43]:
 
 
 df5['location']
 
 
-# In[45]:
+# In[44]:
 
 
 len(df5.location.unique())
 
 
-# In[46]:
+# In[45]:
 
 
 df5.head(20)
 
 
-# In[47]:
+# In[46]:
 
 
 df5[df5['location'] == 'other']
 
 
-# In[48]:
+# In[47]:
 
 
 # total_sqr_ft / bedrooms 
@@ -322,26 +322,26 @@ df5[df5['total_sqft']/df5['bhk']<300].head()
 
 # The code above checks for errors. There is no such thing as a 8 bedroom house with 9 baths that is 600 sqft
 
-# In[49]:
+# In[48]:
 
 
 df5.shape
 
 
-# In[50]:
+# In[49]:
 
 
 #find a something where the total square ft per bedroom is not less that 300 sqft
 df6 = df5[~(df5['total_sqft']/df5['bhk']<300)]
 
 
-# In[51]:
+# In[50]:
 
 
 df6.shape
 
 
-# In[52]:
+# In[51]:
 
 
 df6.head()
@@ -349,7 +349,7 @@ df6.head()
 
 # Price per Square Feet: High and Low
 
-# In[53]:
+# In[52]:
 
 
 df6.price_per_sqft.describe()
@@ -359,7 +359,7 @@ df6.price_per_sqft.describe()
 
 # Filter out everything beyond 1 std deviation 
 
-# In[54]:
+# In[53]:
 
 
 def remove_pps_outliers(df):
@@ -375,25 +375,25 @@ def remove_pps_outliers(df):
     return df_out
 
 
-# In[55]:
+# In[54]:
 
 
 df7 = remove_pps_outliers(df6)
 
 
-# In[56]:
+# In[55]:
 
 
 df7.shape
 
 
-# In[57]:
+# In[56]:
 
 
 import matplotlib.pyplot as plt
 
 
-# In[58]:
+# In[57]:
 
 
 def plot_scatter_chart(df,location):
@@ -411,25 +411,25 @@ def plot_scatter_chart(df,location):
     plt.legend()
 
 
-# In[59]:
+# In[58]:
 
 
 plot_scatter_chart(df7, 'Rajaji Nagar')
 
 
-# In[60]:
+# In[59]:
 
 
 plot_scatter_chart(df7, 'Hebbal')
 
 
-# In[61]:
+# In[60]:
 
 
 df7
 
 
-# In[62]:
+# In[61]:
 
 
 #13:03
@@ -450,37 +450,37 @@ def remove_bhk_outliers(df):
     return df.drop(exclude_indices, axis = 'index')
 
 
-# In[63]:
+# In[62]:
 
 
 df8 = remove_bhk_outliers(df7)
 
 
-# In[64]:
+# In[63]:
 
 
 df8.head(20)
 
 
-# In[65]:
+# In[64]:
 
 
 df8.shape
 
 
-# In[66]:
+# In[65]:
 
 
 #!jupyter nbconvert --to script India_House_Data.ipynb
 
 
-# In[67]:
+# In[66]:
 
 
 plot_scatter_chart(df7,"Hebbal")
 
 
-# In[68]:
+# In[67]:
 
 
 import matplotlib
@@ -490,19 +490,19 @@ plt.xlabel('Price Per Square Feet')
 plt.ylabel('Count')
 
 
-# In[69]:
+# In[68]:
 
 
 df8.bath.unique()
 
 
-# In[70]:
+# In[69]:
 
 
 df8[df8.bath>10]
 
 
-# In[71]:
+# In[70]:
 
 
 plt.hist(df8.bath,rwidth = 0.8)
@@ -510,14 +510,14 @@ plt.xlabel("number of bathrooms")
 plt.ylabel('Count')
 
 
-# In[72]:
+# In[71]:
 
 
 df9 = df8[df8.bath<df8.bhk+2]
 df9.shape
 
 
-# In[73]:
+# In[72]:
 
 
 df10 = df9.drop(['size', 'price_per_sqft'], axis = 'columns')
@@ -526,64 +526,64 @@ df10.head()
 
 # # Machine Learning Model
 
-# In[74]:
+# In[73]:
 
 
 dummies = pd.get_dummies(df10.location)
 dummies.head(3)
 
 
-# In[75]:
+# In[74]:
 
 
 df11 = pd.concat([df10, dummies.drop('other', axis='columns')], axis = 'columns')
 
 
-# In[76]:
+# In[75]:
 
 
 df11.head()
 
 
-# In[77]:
+# In[76]:
 
 
 df12 = df11.drop('location', axis = 'columns')
 
 
-# In[78]:
+# In[77]:
 
 
 df12.head()
 
 
-# In[79]:
+# In[78]:
 
 
 X = df12.drop('price', axis = 'columns')
 X.head()
 
 
-# In[80]:
+# In[79]:
 
 
 y = df12.price
 
 
-# In[81]:
+# In[80]:
 
 
 y.head()
 
 
-# In[83]:
+# In[81]:
 
 
 from sklearn.model_selection import train_test_split
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, random_state = 10)
 
 
-# In[85]:
+# In[82]:
 
 
 from sklearn.linear_model import LinearRegression
@@ -592,7 +592,7 @@ lr_clf.fit(X_train, y_train)
 lr_clf.score(X_test, y_test)
 
 
-# In[86]:
+# In[83]:
 
 
 from sklearn.model_selection import ShuffleSplit 
@@ -603,8 +603,108 @@ cv = ShuffleSplit(n_splits = 5, test_size = 2, random_state = 0)
 cross_val_score(LinearRegression(), X, y, cv = cv)
 
 
+# In[84]:
+
+
+get_ipython().system('jupyter nbconvert --to script India_House_Data.ipynb')
+
+
+# ## Hyperparameter Tuning
+
+# In[85]:
+
+
+from sklearn.model_selection import GridSearchCV
+
+from sklearn.linear_model import Lasso
+from sklearn.tree import DecisionTreeRegressor 
+
+
+# In[86]:
+
+
+def find_best_model_using_GridSearchCV(X,y):
+    algos = {
+        'linear_regression' : {
+            'model': LinearRegression(),
+            'params': {
+                'normalize' : [True, False]
+            }
+            
+        },
+        'lasso' : {
+            'model' : Lasso(),
+            'params': {
+                'alpha': [1,2],
+                'selection': ['random', 'cyclic']
+            }
+        },
+        'decision_tree': {
+            'model': DecisionTreeRegressor(),
+            'params' : {
+                'criterion' : ['mse', 'friedman_mse'],
+                'splitter' : ['best', 'random']
+            }
+        }
+        
+    }
+    scores = []
+    cv = ShuffleSplit(n_splits = 5, test_size = 0.2, random_state = 0)
+    for algo_name, config, in algos.items():
+        gs = GridSearchCV(config['model'], config['params'], cv=cv, return_train_score = False)
+        gs.fit(X,y)
+        scores.append({
+            'model' : algo_name,
+            'best_score': gs.best_score_,
+            'best_params': gs.best_params_
+        })
+    
+    return pd.DataFrame(scores, columns = ['model', 'best_score', 'best_params'])
+
+
+# In[87]:
+
+
+find_best_model_using_GridSearchCV(X,y)
+
+
+# In[89]:
+
+
+X.columns
+
+
+# In[93]:
+
+
+#predict price based off locationn, square feet, # of baths, and # of bedrooms
+def predict_price(location, sqft, bath, bhk):
+    loc_index = np.where(X.columns == location)[0][0]
+    
+    x= np.zeros(len(X.columns))
+    x[0] = sqft
+    x[1] = bath
+    x[2] = bhk
+    if loc_index >= 0:
+        x[loc_index] = 1
+        
+    return lr_clf.predict([x])[0]
+
+
+# In[94]:
+
+
+predict_price('1st Phase JP Nagar', 1000, 2, 2)
+
+
+# In[102]:
+
+
+predict_price('1st Phase JP Nagar', 1000, 2, 2)
+
+
 # In[ ]:
 
 
-from sklearn.model_selection import Grid
+
 
