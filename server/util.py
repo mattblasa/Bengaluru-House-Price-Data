@@ -9,7 +9,7 @@ __model = None
 def get_location_names():
     return __locations
 
-def load_saved_artifacts:
+def load_saved_artifacts():
     print("loading saved artifacts...start")
     global __data_columns
     global __locations
@@ -23,4 +23,5 @@ def load_saved_artifacts:
     print('Loading Artifacts....completed')
 
 if __name__ == '__main__':
+    load_saved_artifacts()
     print(get_location_names())
