@@ -8,8 +8,21 @@ __data_columns = None
 __model = None 
 
 def get_estimated_price(location, sqft, bhk, bath):
+    #if element not found, error is thrown
+    try: 
+        loc_index = __data_columns.index(location.lower())
+    except: 
+        loc_index = -1 
+
+    loc_index = np.where(X.columns == location)[0][0]
     x = np.zeros() 
-    return __model.predict([x])
+    x[0] = sqft
+    x[1] = bath
+    x[2] = bhk
+    if loc_index >= 0:
+        x[loc_index] = 1
+
+    return round(__model.predict([x])[0], 2)
 
 def get_location_names():
     return __locations
@@ -29,4 +42,6 @@ def load_saved_artifacts():
 
 if __name__ == '__main__':
     load_saved_artifacts()
+    print(get_location_names())
+   
     print(get_location_names())
