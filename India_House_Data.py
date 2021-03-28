@@ -668,13 +668,19 @@ def find_best_model_using_GridSearchCV(X,y):
 find_best_model_using_GridSearchCV(X,y)
 
 
-# In[89]:
+# In[88]:
 
 
 X.columns
 
 
-# In[93]:
+# In[96]:
+
+
+X
+
+
+# In[89]:
 
 
 #predict price based off locationn, square feet, # of baths, and # of bedrooms
@@ -691,16 +697,49 @@ def predict_price(location, sqft, bath, bhk):
     return lr_clf.predict([x])[0]
 
 
+# In[90]:
+
+
+predict_price('1st Phase JP Nagar', 1000, 2, 2)
+
+
+# In[91]:
+
+
+predict_price('1st Phase JP Nagar', 1000, 3, 3)
+
+
+# In[92]:
+
+
+predict_price('Indira Nagar', 1000, 2, 2)
+
+
+# In[93]:
+
+
+predict_price('Indira Nagar', 1000, 3, 3)
+
+
+# # Export Model
+
 # In[94]:
 
 
-predict_price('1st Phase JP Nagar', 1000, 2, 2)
+import pickle
+with open ('bangalore_price_model.pickle', 'wb') as f:
+    pickle.dump(lr_clf,f)
 
 
-# In[102]:
+# In[95]:
 
 
-predict_price('1st Phase JP Nagar', 1000, 2, 2)
+import json
+columns = {
+    'data_columns': [col.lower() for col in X.columns]
+}
+with open('columns.json','w') as f:
+    f.write(json.dumps(columns))
 
 
 # In[ ]:
